@@ -1,0 +1,42 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Node example (remove if not needed)
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Run tests
+        run: npm test --if-present
+
+      # Archive build output (adjust to your project)
+      - name: Build
+        run: npm run build --if-present
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-artifact
+          path: |
+            dist
+            build
